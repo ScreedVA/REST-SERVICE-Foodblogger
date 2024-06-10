@@ -5,7 +5,7 @@ from datetime import datetime
 from base64 import b64encode
 import base64
 from flask_migrate import Migrate
-from utility import user_to_dict, user_details_to_dict, image_to_dict, post_to_dict
+from utility import user_to_dict, image_to_dict, post_to_dict
 app = Flask(__name__)
 
 
@@ -39,7 +39,10 @@ class User(db.Model):
     password = db.Column(db.String(50), nullable=False)
     date_joined = db.Column(db.Date, default=datetime.now())
     posts = db.relationship("Post", backref="user", cascade="all, delete-orphan")
-    user_detail = db.relationship("UserDetail", backref="user", cascade="all, delete-orphan", uselist=False)
+    address = db.Column(db.String(100))
+    bio = db.Column(db.Text)
+    date_of_birth = db.Column(db.Date)
+    image = db.relationship("Image", backref="user", cascade="all, delete-orphan", uselist=False)
 
     def __repr__(self) -> str:
         return f"<ID: {self.id} Name: {self.name} Email: {self.email}"
@@ -56,16 +59,15 @@ class Post(db.Model):
     def __repr__(self) -> str:
         return f"<ID: {self.id} Title: {self.title} Body: {self.body} User ID: {self.user_id}"
 
-class UserDetail(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(100))
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    bio = db.Column(db.Text)
-    date_of_birth = db.Column(db.Date)
-    image = db.relationship("Image", backref="user_detail", cascade="all, delete-orphan", uselist=False)
+# class UserDetail(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     address = db.Column(db.String(100))
+#     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+#     bio = db.Column(db.Text)
+#     date_of_birth = db.Column(db.Date)
 
-    def __repr__(self) -> str:
-        return f"<ID: {self.id} Name:{self.user_id} Mimetype: {self.date_of_birth}"
+#     def __repr__(self) -> str:
+#         return f"<ID: {self.id} Name:{self.user_id} Mimetype: {self.date_of_birth}"
 
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -73,7 +75,7 @@ class Image(db.Model):
     name = db.Column(db.Text, nullable=False)
     mimetype = db.Column(db.Text, nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey("post.id", name="fk_image_post_id"))
-    user_detail_id = db.Column(db.Integer, db.ForeignKey("user_detail.id", name="fk_image_user_details_id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id", name="fk_image_user_id"))
 
     def __repr__(self) -> str:
         return f"<ID: {self.id} Name:{self.name} Mimetype: {self.mimetype} Data: {self.img}"
@@ -96,6 +98,94 @@ def root():
 
     return (jsonify(post_list), 200)
 
+
+
+
+@app.route("/get_posts_by_user_id/<user_id>", methods=["GET"])
+def get_posts_by_user_id(user_id):
+    """Returns 200 if posts found, else 404"""
+    posts = Post.query.filter(Post.user_id == user_id).all()
+    post_list = []
+    # If user has no posts
+    if not posts:
+        return (jsonify({"response": "Not found Error"}), 404)
+    
+
+    for post in posts:
+        post_list.append(post_to_dict(post))
+
+    return (jsonify(posts=post_list), 200)
+
+@app.route("/get_post_by_id/<post_id>", methods=["GET"])
+def get_post_by_id(post_id):
+    """Returns post and 200 if post exists else 404"""
+    post = Post.query.filter(Post.id == post_id).first()
+
+    # If post at id does not exist
+    if not post:
+        return jsonify({"response": "Not Found Error"}, 404)
+    # If post at id exists
+    return (jsonify(post=post_to_dict(post)), 200)
+
+@app.route("/get_user_by_id/<user_id>", methods=["GET"])
+def get_user_by_id(user_id):
+    """Returns user and 200 if user exists else 404"""
+    user = User.query.filter(User.id == user_id).first()
+
+    if not user:
+        return (jsonify({"response": "Not Found Error"}), 404)
+    return (jsonify(user_to_dict(user)), 200)
+
+@app.route("/get_all_users", methods=["GET"])
+def get_all_users():
+    """Returns all users and 200 if users exist else 404"""
+    users = User.query.all()
+
+    if not users:
+        return (jsonify({"response": "Not Found Error"}), 404)
+    
+    # Parse SQL_Alchemy objects into python dictionary data types
+    user_list = []
+    for user in users:
+        user_list.append(user_to_dict(user))
+    return (jsonify(users=user_list), 200)
+
+@app.route("/get_all_images", methods=["GET"])
+def get_all_images(): 
+    """Returns all images and 200 if images exist else 404"""
+    images = Image.query.all()
+
+    # Returns 404 if there are no images
+    if not images:
+        return (jsonify({"response": "Not Found Error"}), 404)
+    
+    # Parses SQL Alchemy Image object to Python dictionary data type
+    image_list = [image_to_dict(image) for image in images]
+    return (jsonify(images=image_list), 200)
+
+@app.route("/get_images_by_post_id/<post_id>", methods=["GET"])
+def get_images_by_post_id(post_id): 
+    """Returns post images and 200 if post images exist else 404"""
+    images = Image.query.filter(Image.post_id == post_id).all()
+
+    # Returns 404 if post has no images
+    if not images:
+        return (jsonify({"response": "Not Found Error"}), 404)
+    
+    # Parses SQL Alchemy Image object to Python dictionary data type
+    image_list = [image_to_dict(image) for image in images]
+    return (jsonify(images=image_list), 200)
+
+@app.route("/get_image_by_id/<image_id>", methods=["GET"])
+def get_image_by_id(image_id): 
+    """Returns all images and 200 if images exist else 404"""
+    image = Image.query.filter(Image.id == image_id).first()
+
+    # Returns 404 if image does not exist
+    if not image:
+        return (jsonify({"response": "Not Found Error"}), 404)
+    return (jsonify(image=image_to_dict(image)), 200)
+
 @app.route("/create_user", methods=["POST"])
 def create_user():
     """Creates a new user from JSON input and returns its data"""
@@ -117,158 +207,91 @@ def create_user():
         return jsonify({"error": "Missing required fields"}), 400
 
     # Create User and UserDetail instances
-    user = User(name=name, email=email, password=password)
     date_object = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
-    user_detail = UserDetail(address=address, date_of_birth=date_object, bio=bio, user=user)
-
+    user = User(name=name, email=email, password=password, address=address, bio=bio, date_of_birth=date_object)
     # Save user and user detail to the database
     db.session.add(user)
-    db.session.add(user_detail)
     db.session.commit()
 
     # Handle profile image if provided
     if profile_image_data:
-        profile_image = Image(img=profile_image_data, mimetype='image/jpeg', name=f"{user.id}_profile.jpg", user_detail=user_detail)
+        profile_image = Image(img=profile_image_data, mimetype='image/jpeg', name=f"{user.id}_profile.jpg", user=user)
         db.session.add(profile_image)
         db.session.commit()
 
-    # Prepare the response data
-    new_user = {
-        "id": user.id,
-        "name": user.name,
-        "email": user.email,
-        "date_of_birth": date_of_birth,
-        "address": address,
-        "bio": bio,
-        "profile_image": profile_image_data  # Assuming you want to include this in the response
-    }
+    return jsonify(user=user_to_dict(user)), 201
 
-    return jsonify(user=new_user), 201
-
-
-
-@app.route("/get_posts_by_user_id/<user_id>")
-def get_posts_by_user_id(user_id):
-    """Returns 200 if posts found, else 404"""
-    posts = Post.query.filter(Post.user_id == user_id).all()
-    post_list = []
-    # If user has no posts
-    if not posts:
-        return (jsonify({"response": "Not found Error"}), 404)
-    
-
-    for post in posts:
-        post_list.append(post_to_dict(post))
-
-    return (jsonify(posts=post_list), 200)
-
-@app.route("/get_post_by_id/<post_id>")
-def get_post_by_id(post_id):
-    """Returns post and 200 if post exists else 404"""
-    post = Post.query.filter(Post.id == post_id).first()
-
-    # If post at id does not exist
-    if not post:
-        return jsonify({"response": "Not Found Error"}, 404)
-    # If post at id exists
-    return (jsonify(post=post_to_dict(post)), 200)
-
-@app.route("/get_user_by_id/<user_id>")
-def get_user_by_id(user_id):
-    """Returns user and 200 if user exists else 404"""
+@app.route("/create_post/<user_id>", methods=["POST"])
+def create_post(user_id):
     user = User.query.filter(User.id == user_id).first()
 
     if not user:
-        return (jsonify({"response": "Not Found Error"}), 404)
-    return (jsonify(user_to_dict(user)), 200)
-
-@app.route("/get_all_users")
-def get_all_users():
-    """Returns all users and 200 if users exist else 404"""
-    users = User.query.all()
-
-    if not users:
-        return (jsonify({"response": "Not Found Error"}), 404)
+        return (jsonify({"error": "User not found"}), 404)
+    data = request.get_json()
     
-    # Parse SQL_Alchemy objects into python dictionary data types
-    user_list = []
-    for user in users:
-        user_list.append(user_to_dict(user))
-    return (jsonify(users=user_list), 200)
-
-@app.route("/get_all_images")
-def get_all_images(): 
-    """Returns all images and 200 if images exist else 404"""
-    images = Image.query.all()
-
-    # Returns 404 if there are no images
-    if not images:
-        return (jsonify({"response": "Not Found Error"}), 404)
+    if not data:
+        return (jsonify({"error":"Invalid Input"}), 400)
     
-    # Parses SQL Alchemy Image object to Python dictionary data type
-    image_list = [image_to_dict(image) for image in images]
-    return (jsonify(images=image_list), 200)
+    title = data.get("title")
+    body = data.get("body")
+    category = data.get("category")
+    post_image_b64 = data.get("post_image")
 
-@app.route("/get_images_by_post_id/<post_id>")
-def get_images_by_post_id(post_id): 
-    """Returns post images and 200 if post images exist else 404"""
-    images = Image.query.filter(Image.post_id == post_id).all()
-
-    # Returns 404 if post has no images
-    if not images:
-        return (jsonify({"response": "Not Found Error"}), 404)
-    
-    # Parses SQL Alchemy Image object to Python dictionary data type
-    image_list = [image_to_dict(image) for image in images]
-    return (jsonify(images=image_list), 200)
-
-@app.route("/get_image_by_id/<image_id>")
-def get_image_by_id(image_id): 
-    """Returns all images and 200 if images exist else 404"""
-    image = Image.query.filter(Image.id == image_id).first()
-
-    # Returns 404 if image does not exist
-    if not image:
-        return (jsonify({"response": "Not Found Error"}), 404)
-    return (jsonify(image=image_to_dict(image)), 200)
+    if not all([title, body, category]):
+        return (jsonify({"error": "Missing required fields"}), 400)
 
 
-@app.route("/edit_user/<user_id>", methods=["GET", "POST", "PUT"])
-def edit_user(user_id):
-    """Routes user to edit_user.html where user can edit thier account details
-    GET: returns 200
-    POST: returns 201"""
-    profile_image = None
-    user = User.query.filter(User.id == user_id).first()
-    user_detail = UserDetail.query.filter(UserDetail.user_id == user.id).first()
-    if user_detail:
-        profile_image = Image.query.filter(Image.user_detail_id == user_detail.id).first()
-    if request.method == "POST" or request.method == "PUT":
-        # Check if user submited the edit user form
-        user.name = session["username"] = request.form["username"]
-        user.email = request.form["email"]
-        user.password = request.form["password"]
-        user_detail.address = request.form["address"]
-        user_detail.date_of_birth = datetime.strptime(request.form["date_of_birth"], '%Y-%m-%d').date()
-        user_detail.bio = request.form["bio"]
+    post = Post(title=title, body=body, category=category, user=user)
+    db.session.add(post)
+    db.session.commit()
 
-        db.session.add(user)
-        db.session.add(user_detail)
+    # Add post image to data base if user passed in one
+    if post_image_b64:
+        image = Image(img=post_image_b64, name=f"{post.id}_post.jpg", mimetype="image/jpeg", post=post)
+        db.session.add(image)
         db.session.commit()
-        pic = request.files["profile_image"]
-        if pic:
-            # Check if user uploaded a new image
-            if user_detail.image:
-            # Check if User profile image already exists
-                profile_image = Image.query.filter(Image.user_detail_id == user_detail.id).first()
-                db.session.delete(profile_image)
-                db.session.commit()
-            new_profile_image = Image(img=pic.read(), mimetype=pic.mimetype, name=secure_filename(pic.filename), user_detail=user_detail)
-            db.session.add(new_profile_image)
-            db.session.commit()
-        flash(f"{user.name} Has been edited", category="warning")
-        return redirect(url_for("user_gallery", user_id=user_id)) # The 201 request has been fulfilled as new resources are being created 
-    return render_template("/user_temps/edit_user.html", user=user, user_detail=user_detail, profile_image=profile_image) # The request has succeeded, as the edit_post.html page is returned
+
+    return (jsonify(post=post_to_dict(post)), 201)
+
+
+@app.route("/edit_user/<user_id>", methods=["PUT"])
+def edit_user(user_id):
+    """Creates a new user from JSON input and returns its data"""
+    user = User.query.filter(User.id == user_id).first()
+    if not user:
+        return (jsonify({"error": "User Not Found"}), 404)
+
+    data = request.get_json()  # Parse JSON data from request body
+
+    if not data:
+        return (jsonify({"error": "Invalid input"}), 400)
+
+    # Extract data from the JSON payload
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")
+    date_of_birth = data.get("date_of_birth")
+    address = data.get("address")
+    bio = data.get("bio")
+    profile_image_data = data.get("profile_image")  # Assuming image data is sent as base64 string or URL
+    date_object = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+
+    if not all([name, email, password, date_of_birth, address, bio]):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    user.name = name
+    user.email = email
+    user.password = password
+    user.date_of_birth = date_object
+    user.address = address
+    user.bio = bio
+    
+    # Create User and UserDetail instances
+    # Save user to the database
+    db.session.commit()
+
+    return jsonify(user=user_to_dict(user)), 201
+
 
 
 @app.route("/delete_user/<user_id>", methods=["GET", "DELETE"])
@@ -386,16 +409,16 @@ def select_image_view(image_id):
     return render_template("image_temps/select_image_view.html", from_view=request_from, image=image, post=post) # The 200 request has succeeded, as the select_view_post.html page is returned
 
 
-@app.errorhandler(404)
-def not_found_error(error):
-    """Routes user to 404.html if a non existing route is entered"""
+# @app.errorhandler(404)
+# def not_found_error(error):
+#     """Routes user to 404.html if a non existing route is entered"""
 
-    return render_template("error_temps/404.html"), 404
+#     return render_template("error_temps/404.html"), 404
 
-@app.errorhandler(500)
-def internal_server_error(error):
+# @app.errorhandler(500)
+# def internal_server_error(error):
 
-    return render_template("error_temps/500.html"), 500
+#     return render_template("error_temps/500.html"), 500
 
 
 def new_post(title, body, category):
@@ -453,7 +476,8 @@ def unit_test_new_post():
 
 
 # with app.app_context():
-#     unit_test_new_post()
+#     db.drop_all()
+#     db.create_all()
 
 if __name__ == "__main__":
     app.run(debug=True)

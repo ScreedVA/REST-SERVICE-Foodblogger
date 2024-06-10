@@ -4,7 +4,10 @@ def user_to_dict(user):
         "name": user.name,
         "email": user.email,
         "password": user.password,
-        "date_joined": user.date_joined
+        "date_joined": user.date_joined,
+        "address": user.address,
+        "bio": user.bio,
+        "date_of_birth": user.date_of_birth
     }
 
 
@@ -17,16 +20,6 @@ def post_to_dict(post):
         "categroy": post.category,
         "date_created": post.date_created
     }
-
-
-def user_details_to_dict(user_details):
-    return {
-        "id": user_details.id,
-        "address": user_details.address,
-        "user_id": user_details.id,
-        "bio": user_details.bio,
-        "date_of_birth": user_details.date_of_birth
-    } 
 
 def image_to_dict(image):
     return {

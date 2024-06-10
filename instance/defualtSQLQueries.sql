@@ -2,24 +2,22 @@ SELECT * FROM user;
 SELECT * FROM post;
 SELECT * FROM image;
 
-INSERT INTO user(name, email, password, date_joined)
+
+SELECT * FROM user
+INNER JOIN user_detail
+ON user.id = user_detail.id;
+
+
+
+
+INSERT INTO user(name, email, password, date_joined, address, bio, date_of_birth)
 VALUES 
-("Bob", "bob@example.com", "password123", strftime('%Y-%m-%d', 'now')),
-("Charlie", "charlieb@example.com", "password123", strftime('%Y-%m-%d', 'now')),
-("Alice", "alice@example.com", "password123", strftime('%Y-%m-%d', 'now'));
-
-
-INSERT INTO user_detail(address, bio, date_of_birth, user_id)
-VALUES
-("example str, 123", "Passionate dessert enthusiast with a sweet tooth and a penchant for indulgence", strftime('%Y-%m-%d', '2001-05.20'),1),
-
-("example str, 123", "Lunch aficionado with a penchant for exploring culinary delights midday. Always on the hunt for the perfect lunch spot, 
-blending taste and ambiance for the ultimate dining experience.", strftime('%Y-%m-%d', '2001-05.20'),2),
-
-("example str, 123", "Breakfast enthusiast with a passion for starting the day with culinary creativity 
+("Bob", "bob@example.com", "password123", strftime('%Y-%m-%d', 'now'), "example str, 123", "Passionate dessert enthusiast with a sweet tooth and a penchant for indulgence", strftime('%Y-%m-%d', '2001-05.20')),
+("Charlie", "charlieb@example.com", "password123", strftime('%Y-%m-%d', 'now'), "example str, 123", "Lunch aficionado with a penchant for exploring culinary delights midday. Always on the hunt for the perfect lunch spot, 
+blending taste and ambiance for the ultimate dining experience.", strftime('%Y-%m-%d', '2001-05.20')),
+("Alice", "alice@example.com", "password123", strftime('%Y-%m-%d', 'now'), "example str, 123", "Breakfast enthusiast with a passion for starting the day with culinary creativity 
 and comfort food classics. Always seeking the perfect balance of flavor and nourishment to kickstart 
-mornings with joy", strftime('%Y-%m-%d', '2001-05.20'), 3);
-
+mornings with joy", strftime('%Y-%m-%d', '2001-05.20'));
 
 INSERT INTO post(title, body, user_id, category, date_created)
 VALUES
@@ -65,11 +63,15 @@ noodles. Lon Men’s is almost always full in the evening, but the turnover is f
 
 
 DELETE FROM user;
-
 DELETE FROM post;
 DELETE FROM image;
 
 
+DELETE FROM user
+WHERE name = "TestUser3";
+
+DELETE FROM image
+WHERE user_detail_id = 12
 
 -- References:
 -- Dessert Posts: https://qweencity.com/food-review-all-of-the-desserts/
