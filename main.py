@@ -83,14 +83,6 @@ class Image(db.Model):
 # class User_Image(db.Model):
 #     pass
 
-@app.context_processor
-def inject_global_variables():
-    is_signed_in = session.get("is_signed_in", False)
-    current_user_id = session.get("user_id", 10000)
-    blog_filter = session.get("blog_filter", "No Filter")
-    return dict(signed_in=is_signed_in, limit_postlength=limit_postlength, blog_filter=blog_filter, current_user_id=current_user_id)
-
-
 @app.route("/", methods=["GET"])
 def root():
     """Routes user to root page and displays all user posts
@@ -102,8 +94,7 @@ def root():
         post_list.append(post_to_dict(post))
 
 
-    return jsonify(post_list), 200
-
+    return (jsonify(post_list), 200)
 
 @app.route("/create_user", methods=["POST"])
 def create_user():
@@ -156,69 +147,91 @@ def create_user():
 
 
 
-
-@app.route("/sign_in", methods=["GET", "POST"])
-def sign_in():
-    """Routes use to sign_in.html page
-    GET: returns 200
-    POST: returns 200, redirects to user_gallery router"""
-    users = User.query.all()
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        user = User.query.filter(User.name == username).first()
-        if user and user.password == password:
-            print(user)
-
-            session["is_signed_in"] = True
-            session["user_id"] = user.id
-            session["username"] = username
-            flash(f"Welcome {user.name}", category="success")
-            return redirect(url_for("user_gallery", user_id=user.id)) # 200 The request has suceeded, as the user_gallery router is returned.
-        else:
-            flash("Wrong password or username", category="danger")
-
-    return (render_template("/user_temps/sign_in.html", users=users), 200) # The request has suceeded, as the sign_in.html page is returned.
-
-
-@app.route("/user_gallery")
-@app.route("/user_gallery/<user_id>")
-def user_gallery(user_id):
-    """Routes user to user_gallery.html page which includes buttons to route to edit_user, delete_user and make_post
-    GET: returns 200"""
-    # if "is_signed_in" in session and session["is_signed_in"]:
-    # Checks if a user is signed in
-    profile_image = None
-    user = User.query.filter(User.id == user_id).first()
-    posts = Post.query.filter(Post.user_id == user.id).all()        
-    user_details = UserDetail.query.filter(UserDetail.user_id == user.id).first()
-    if user_details:
-        profile_image = Image.query.filter(Image.user_detail_id == user_details.id).first()
-    return (render_template("user_temps/user_gallery.html", username=user.name, user=user, posts=posts, image_class=Image, profile_image=profile_image), 200) # 200 The request has suceeded, as the user_gallery.html page is returned.
-    # return (render_template("user_temps/user_gallery.html", user=user,), 200) # 200 The request has suceeded, as the user_gallery.html page is returned.
-
-@app.route("/select_user_profile_view/<user_id>")
-def select_user_profile_view(user_id):
-    """Routes user to user_profile_view.html page, which displays user's full details"""
-    user = User.query.filter(User.id == user_id).first()
-    user_detail = UserDetail.query.filter(UserDetail.user_id == user.id).first()
-    post = Post.query.filter(Post.user_id == user_id).all()
-    profile_image = Image.query.filter(Image.user_detail_id == user_detail.id).first()
-    request_from = request.args.get("from_view")
-
-    return (render_template("user_temps/select_user_profile_view.html", user=user, user_detail=user_detail, post=post, profile_image=profile_image, from_view=request_from), 200) # The request has suceeded, as the select_user_profile_view.html page is returned.
-
-@app.route("/sign_out")
-def sign_out():
-    """Routes user back to root page
-    GET: returns 200"""
+@app.route("/get_posts_by_user_id/<user_id>")
+def get_posts_by_user_id(user_id):
+    """Returns 200 if posts found, else 404"""
+    posts = Post.query.filter(Post.user_id == user_id).all()
+    post_list = []
+    # If user has no posts
+    if not posts:
+        return (jsonify({"response": "Not found Error"}), 404)
     
-    flash(f"Signed out of {session["username"]}", category="danger")
-    session.pop("is_signed_in", None)
-    session.pop("username", None)
-    session.pop("user_id", None)
 
-    return redirect(url_for("root")) # 200 The request has suceeded, as the root.html page is returned.
+    for post in posts:
+        post_list.append(post_to_dict(post))
+
+    return (jsonify(posts=post_list), 200)
+
+@app.route("/get_post_by_id/<post_id>")
+def get_post_by_id(post_id):
+    """Returns post and 200 if post exists else 404"""
+    post = Post.query.filter(Post.id == post_id).first()
+
+    # If post at id does not exist
+    if not post:
+        return jsonify({"response": "Not Found Error"}, 404)
+    # If post at id exists
+    return (jsonify(post=post_to_dict(post)), 200)
+
+@app.route("/get_user_by_id/<user_id>")
+def get_user_by_id(user_id):
+    """Returns user and 200 if user exists else 404"""
+    user = User.query.filter(User.id == user_id).first()
+
+    if not user:
+        return (jsonify({"response": "Not Found Error"}), 404)
+    return (jsonify(user_to_dict(user)), 200)
+
+@app.route("/get_all_users")
+def get_all_users():
+    """Returns all users and 200 if users exist else 404"""
+    users = User.query.all()
+
+    if not users:
+        return (jsonify({"response": "Not Found Error"}), 404)
+    
+    # Parse SQL_Alchemy objects into python dictionary data types
+    user_list = []
+    for user in users:
+        user_list.append(user_to_dict(user))
+    return (jsonify(users=user_list), 200)
+
+@app.route("/get_all_images")
+def get_all_images(): 
+    """Returns all images and 200 if images exist else 404"""
+    images = Image.query.all()
+
+    # Returns 404 if there are no images
+    if not images:
+        return (jsonify({"response": "Not Found Error"}), 404)
+    
+    # Parses SQL Alchemy Image object to Python dictionary data type
+    image_list = [image_to_dict(image) for image in images]
+    return (jsonify(images=image_list), 200)
+
+@app.route("/get_images_by_post_id/<post_id>")
+def get_images_by_post_id(post_id): 
+    """Returns post images and 200 if post images exist else 404"""
+    images = Image.query.filter(Image.post_id == post_id).all()
+
+    # Returns 404 if post has no images
+    if not images:
+        return (jsonify({"response": "Not Found Error"}), 404)
+    
+    # Parses SQL Alchemy Image object to Python dictionary data type
+    image_list = [image_to_dict(image) for image in images]
+    return (jsonify(images=image_list), 200)
+
+@app.route("/get_image_by_id/<image_id>")
+def get_image_by_id(image_id): 
+    """Returns all images and 200 if images exist else 404"""
+    image = Image.query.filter(Image.id == image_id).first()
+
+    # Returns 404 if image does not exist
+    if not image:
+        return (jsonify({"response": "Not Found Error"}), 404)
+    return (jsonify(image=image_to_dict(image)), 200)
+
 
 @app.route("/edit_user/<user_id>", methods=["GET", "POST", "PUT"])
 def edit_user(user_id):
@@ -451,7 +464,7 @@ if __name__ == "__main__":
 
 
 
-
+# TODO Combine user_details and user into a single table and set a foreign key in users
 # TODO Add feature to test one endpoint
 # TODO MAJOR REFACTORING OF ALL ROUTES TO RETURN HTTP RESPONSE OR JSON DATA
 # TODO Create dictionary parsing functions as utilities for returning JSON DATA

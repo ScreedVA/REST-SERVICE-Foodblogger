@@ -31,7 +31,7 @@ def user_details_to_dict(user_details):
 def image_to_dict(image):
     return {
         "id": image.id,
-        "img": image.img,
+        "img": str(image.img),
         "name": image.name,
         "mimetype": image.mimetype,
         "post_id": image.post_id,
