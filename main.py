@@ -97,6 +97,7 @@ def root():
     GET: returns 200"""
     posts = Post.query.all()
     post_list = []
+
     for post in posts:
         post_list.append(post_to_dict(post))
 
@@ -104,43 +105,56 @@ def root():
     return jsonify(post_list), 200
 
 
+@app.route("/create_user", methods=["POST"])
+def create_user():
+    """Creates a new user from JSON input and returns its data"""
+    data = request.get_json()  # Parse JSON data from request body
 
+    if not data:
+        return jsonify({"error": "Invalid input"}), 400
 
+    # Extract data from the JSON payload
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")
+    date_of_birth = data.get("date_of_birth")
+    address = data.get("address")
+    bio = data.get("bio")
+    profile_image_data = data.get("profile_image")  # Assuming image data is sent as base64 string or URL
 
+    if not all([name, email, password, date_of_birth, address, bio]):
+        return jsonify({"error": "Missing required fields"}), 400
 
+    # Create User and UserDetail instances
+    user = User(name=name, email=email, password=password)
+    date_object = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+    user_detail = UserDetail(address=address, date_of_birth=date_object, bio=bio, user=user)
 
+    # Save user and user detail to the database
+    db.session.add(user)
+    db.session.add(user_detail)
+    db.session.commit()
 
-
-@app.route("/sign_up", methods=["GET", "POST"])
-def sign_up():
-    """Routes user to sign_up.html page
-    GET: returns 200
-    POST: returns 201, redirects to sign_in router"""
-    users = User.query.all()
-    if request.method == "POST":
-        name = request.form["name"] 
-        email = request.form["email"]
-        password = request.form["password"]
-        
-        user = User(name=name, email=email, password=password)
-        date_of_birth = request.form["date_of_birth"] 
-        date_object = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
-        user_detail = UserDetail(address=request.form["address"], date_of_birth=date_object,bio=request.form["bio"],  user=user)
-        image = request.files.get("profile_image")
-
-        db.session.add(user)
-        db.session.add(user_detail)
+    # Handle profile image if provided
+    if profile_image_data:
+        profile_image = Image(img=profile_image_data, mimetype='image/jpeg', name=f"{user.id}_profile.jpg", user_detail=user_detail)
+        db.session.add(profile_image)
         db.session.commit()
 
-        if image:
-            profile_image = Image(img=image.read(), mimetype=image.mimetype, name=secure_filename(image.filename), user_detail=user_detail)
-            db.session.add(profile_image)
+    # Prepare the response data
+    new_user = {
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "date_of_birth": date_of_birth,
+        "address": address,
+        "bio": bio,
+        "profile_image": profile_image_data  # Assuming you want to include this in the response
+    }
 
-            db.session.commit()
-        users = User.query.all()
-        flash("Successfully Signed Up", category="success")
-        return redirect(url_for("sign_in")) # 201 Request has been fulfilled and resulted in new resources being created
-    return (render_template("/user_temps/sign_up.html", users=users), 200) # The request has suceeded, as the sign_up.html page is returned.
+    return jsonify(user=new_user), 201
+
+
 
 
 @app.route("/sign_in", methods=["GET", "POST"])
@@ -438,7 +452,7 @@ if __name__ == "__main__":
 
 
 
-
+# TODO Add feature to test one endpoint
 # TODO MAJOR REFACTORING OF ALL ROUTES TO RETURN HTTP RESPONSE OR JSON DATA
 # TODO Create dictionary parsing functions as utilities for returning JSON DATA
 
