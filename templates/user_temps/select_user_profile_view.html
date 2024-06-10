@@ -1,0 +1,54 @@
+{% extends "base.html" %} {% block content %}
+<div class="row">
+  <div class="col-6 mx-auto">
+    <div class="d-flex flex-column">
+      <div class="d-flex flex-row justify-content-around">
+        <h1 class="my-auto">User Profile</h1>
+        {% if user_detail.image %}
+        <div>
+          <img src="data:{{ profile_image.mimetype}};base64,{{ profile_image.img |b64encode}}" alt="Profile Picture"
+            class="img-fluid small-round-img" />
+        </div>
+        {% endif %}
+      </div>
+      <hr />
+      <div class="d-flex flex-row justify-content-between">
+        <h5 class="text-secondary">Username:</h5>
+        <p>{{ user.name }}</p>
+      </div>
+      <hr />
+      <div class="d-flex flex-row justify-content-between">
+        <h5 class="text-secondary">Email:</h5>
+        <p>{{ user.email }}</p>
+      </div>
+      {% if from_view == "user_gallery" %}
+      <hr />
+      <div class="d-flex flex-row justify-content-between">
+        <h5 class="text-secondary">Password</h5>
+        <p>{{ user.password }}</p>
+      </div>
+      <hr />
+      <div class="d-flex flex-row justify-content-between">
+        <h5 class="text-secondary">Address</h5>
+        <p>{{ user_detail.address}}</p>
+      </div>
+      {% endif %}
+      <hr />
+      <div class="d-flex flex-row justify-content-between">
+        <h5 style="margin-right: 100px" class="text-secondary">Biography</h5>
+        <div>
+          <p style="font-size: 12px">{{ user_detail.bio}}</p>
+        </div>
+      </div>
+      <hr />
+      <div class="d-flex flex-row justify-content-between">
+        <h5 class="text-secondary">Birthdate</h5>
+        <p>{{ user_detail.date_of_birth }}</p>
+      </div>
+      {% if from_view =='user_gallery'%}
+      <a href="{{url_for('edit_user', user_id=user.id)}}" class="btn btn-primary">Edit {{user.name}}</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html"%} {% block content %}
+<div class="row">
+  <div class="col-6 mx-auto">
+    <div class="d-flex flex-column">
+      <img src="data: {{image.mimetype}};base64,{{image.img |b64encode}}" alt="{{image.name}}" class="img-fluid mb-3"
+        style="width: 100%" />
+      <div class="d-flex flex-md-row">
+        {% if from_view=="user_gallery"%}
+        <form method="POST" class="me-3">
+          <button type="submit" class="btn btn-danger">Delete Image</button>
+        </form>
+        {% endif %}
+        <a href="{{url_for('select_post_view', post_id=post.id, from_view=from_view)}}" class="btn btn-primary">
+          < Back</a>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+</div>

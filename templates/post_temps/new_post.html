@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% block content %}
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <h1>This is the New Post Page</h1>
+    <hr />
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <form method="POST" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" name="title" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label for="body" class="from-label">Body</label>
+        <textarea
+          style="resize: none"
+          name="body"
+          class="form-control"
+          rows="8"
+        ></textarea>
+      </div>
+      <div class="mb-3">
+        <label for="category" class="label-form">Choose Category</label>
+        <select class="form-select" name="category">
+          <option selected></option>
+          <option value="Breakfast">Breakfast</option>
+          <option value="Lunch">Lunch</option>
+          <option value="Dinner">Dinner</option>
+          <option value="Dessert">Dessert</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="image" class="label-form"
+          >Upload Image (JPEG,PNG,GIF)</label
+        >
+        <input type="file" name="image" class="form-control" />
+      </div>
+      <button type="submit" class="btn btn-success">Publish</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

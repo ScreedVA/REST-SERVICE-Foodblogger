@@ -1,0 +1,81 @@
+{% extends "base.html" %} {% block content %}
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <h1>This is the Sign Up page</h1>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <form id="form" method="POST" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="" class="form-label">Name</label>
+        <input id="name" name="name" type="text" class="form-control" placeholder="*Name" />
+        <div>
+          <small id="nameError" class="text-danger error"></small>
+          <small id="nameError1" class="text-danger error"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input id="email" name="email" type="text" class="form-control" placeholder="*Email" />
+        <div>
+          <small class="text-danger error" id="emailError"></small>
+          <small class="text-danger error" id="emailError1"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" name="password" type="text" class="form-control" placeholder="*Password" />
+        <div>
+          <small class="text-danger error" id="passwordError"></small>
+          <small class="text-danger error" id="passwordError1"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="address" class="form-label">Address</label>
+        <input id="address" name="address" type="text" class="form-control" placeholder="Address" />
+        <div>
+          <small class="text-danger error" id="addressError"></small>
+          <small class="text-danger error" id="addressError1"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="bio" class="label-form">Biography</label>
+        <textarea id="bio" name="bio" class="form-control"></textarea>
+        <div>
+          <small class="text-danger error" id="bioError"></small>
+          <small class="text-danger error" id="bioError1"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="date_of_birth" class="form-label">Date of birth</label>
+        <input id="dob" name="date_of_birth" type="date" class="form-control" />
+        <div>
+          <small class="text-danger error" id="dobError"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="profile_image" class="form-label">Profile Image</label>
+        <input id="profile_image" name="profile_image" type="file" class="form-control" />
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
+
+<!-- <div class="row">
+  <div class="col-md-6">
+    <table class="table table-striped">
+      {% for user in users %}
+      <tr>
+        <td>{{user.id}}</td>
+        <td>{{user.name}}</td>
+        <td>{{user.email}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div> -->
+{% endblock %}

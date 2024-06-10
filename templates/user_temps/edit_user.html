@@ -1,0 +1,75 @@
+{% extends "base.html" %} {% block content %}
+<div class="row">
+  <div class="col-md-6 mx-auto d-flex d-column justify-content-between">
+    <div>
+      <h1>Edit {{user.name}}</h1>
+    </div>
+    {% if profile_image%}
+    <div>
+      <img src="data: {{profile_image.mimetype}};base64,{{profile_image.img|b64encode}}"
+        alt="{{user.name}}'s Profile Image" class="small-round-img">
+    </div>
+  </div>
+  {% endif %}
+</div>
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <form id="form" method="POST" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input value="{{user.name}}" type="text" name="username" class="form-control" id="name" />
+        <div>
+          <small class="text-danger error" id="nameError"></small>
+          <small class="text-danger error" id="nameError1"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input id="email" value="{{user.email}}" type="text" name="email" class="form-control" />
+        <div>
+          <small class="text-danger error" id="emailError"></small>
+          <small class="text-danger error" id="emailError1"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" value="{{user.password}}" type="text" name="password" class="form-control" />
+        <div>
+          <small class="text-danger error" id="passwordError"></small>
+          <small class="text-danger error" id="passwordError1"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="address" class="form-label">Address</label>
+        <input id="address" value="{{user_detail.address}}" name="address" type="text" class="form-control" />
+        <div>
+          <small class="text-danger error" id="addressError"></small>
+          <small class="text-danger error" id="addressError1"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="bio" class="label-form">Biography</label>
+        <textarea id="bio" name="bio" class="form-control">
+{{ user_detail.bio}}</textarea>
+        <div>
+          <small class="text-danger error" id="bioError"></small>
+          <small class="text-danger error" id="bioError1"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="date_of_birth" class="form-label">Date of birth</label>
+        <input id="dob" value="{{user_detail.date_of_birth}}" name="date_of_birth" type="date" class="form-control" />
+        <div>
+          <small class="text-danger error" id="dobError"></small>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="profile_image" class="form-label">Profile Image</label>
+        <input name="profile_image" type="file" class="form-control" />
+      </div>
+
+      <button type="submit" class="btn btn-success">Verfy Edit</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

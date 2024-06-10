@@ -1,0 +1,59 @@
+{% extends "base.html" %} {% block content %}
+<div class="row">
+  <div class="col-md-6 mx-auto d-flex d-column justify-content-between">
+    <div>
+      <h1>Post By:
+        <a class="remove-decor" href="{{ url_for('select_user_profile_view', user_id=user.id, from_view=from_view)}}">
+          <span>{{ user.name }}</span></a>
+      </h1>
+    </div>
+    {% if profile_image %}
+    <div>
+      <a href="{{url_for('select_user_profile_view', user_id=user.id, from_view=from_view)}}" class="remove-decor">
+        <img src="data: {{profile_image.mimetype}};base64,{{profile_image.img|b64encode}}"
+          alt="{{ user.name}}'s Profile image" class="small-round-img">
+    </div></a>
+    {% endif %}
+  </div>
+  <div class="container">
+    <br />
+    <div class="row">
+      <div class="col-md-6 mx-auto">
+        <h2>{{ post.title }}</h2>
+        <h6 class="text-body-secondary">{{ post.category}}</h6>
+        <hr />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mx-auto">
+        <p>{{ post.body | replace('[BREAK]', '<br \>') | safe }}</p>
+      </div>
+    </div>
+    {% if from_view=="user_gallery" %}
+    <div class="row">
+      <div class="col-md-6 mx-auto mb-3">
+        <div class="d-flex">
+          <a href="{{url_for('delete_post', post_id=post.id)}}" class="btn btn-danger me-2">Delete Post</a>
+          <a href="{{url_for('edit_post', post_id=post.id, from_view=from_view)}}" class="btn btn-primary me-2">Edit
+            Post</a>
+          <a href="{{url_for('user_gallery', user_id=user.id)}}" class="btn btn-success">
+            < Back</a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    <div class="row">
+      <div class="col-md-6 mx-auto mb-3">
+        {% if post.image %} {% for image in images%}
+        <div style="display: inline-flex">
+          <a href="{{ url_for('select_image_view', image_id=image.id, from_view=from_view)}}"><img
+              src="data: {{ image.mimetype }};base64,{{ image.img|b64encode}}" alt="" class="img-fluid"
+              style="width: 250px" /></a>
+        </div>
+        {% endfor %} {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

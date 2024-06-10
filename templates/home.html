@@ -1,0 +1,114 @@
+{% extends "base.html" %} {% block content %}
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div class="row">
+      <div class="col-6">
+        <h1>Welcome To Food Blogger</h1>
+      </div>
+      <div class="col-6">
+        <form method="POST" id="blogFilterForm">
+          <select
+            class="form-select"
+            name="blogFilterSelect"
+            id="blogFilterSelect"
+          >
+            <option selected>{{ blog_filter}}</option>
+            <option value="No Filter">No Filter</option>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dinner">Dinner</option>
+            <option value="Dessert">Dessert</option>
+          </select>
+        </form>
+      </div>
+      <div class="col">
+        <p>
+          Welcome to the delicious world of Food Blogger, where culinary
+          adventures come to life! Explore mouthwatering recipes, expert cooking
+          tips, and vibrant food photography that will inspire your next kitchen
+          masterpiece.
+        </p>
+      </div>
+    </div>
+    <hr />
+  </div>
+</div>
+<br />
+{% for post in posts: %}
+<!--  RENDER THIS POST BLOCK INSTANCE WITH IMAGE-->
+{% if post.image %}
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div
+      class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative"
+      style="height: 200px"
+    >
+      <div class="col-3 position-relative">
+        <img
+          src="data: {{Image.query.filter(Image.post_id == post.id).first().mimetype}};base64,{{Image.query.filter(Image.post_id == post.id).first().img|b64encode}}"
+          alt="{{Image.query.filter(Image.post_id == post.id).first().name}}"
+          class="position-absolute top-0 start-0 w-100 h-100"
+          style="object-fit: cover"
+        />
+      </div>
+      <div class="col p-9 flex-column bg-light shadow-lg">
+        <strong
+          class="d-inline-block mb-2 text-success-emphasis"
+          style="direction: ltr; text-align: left"
+          >{{ post.category }}</strong
+        >
+        <a
+          href="{{ url_for('select_post_view', post_id=post.id, from_view='home')}}"
+          style="text-decoration: none; color: inherit"
+          ><h3 class="mb-0" style="direction: ltr; text-align: left">
+            {{ post.title }}
+          </h3></a
+        >
+        <div
+          class="mb-1 text-body-secondary"
+          style="direction: ltr; text-align: left"
+        >
+          {{ post.date_created }}
+        </div>
+        <p class="mb-auto" style="direction: ltr; text-align: left">
+          {{ limit_postlength(post.body)}}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RENDER BLOCK POST INSTANCE WITHOUT IMAGE -->
+{% else: %}
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div
+      class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative"
+    >
+      <div class="col p-4 flex-column bg-light shadow-lg">
+        <strong
+          class="d-inline-block mb-2 text-success-emphasis"
+          style="direction: ltr; text-align: left"
+          >{{ post.category }}</strong
+        >
+        <a
+          href="{{ url_for('select_post_view', post_id=post.id, from_view='home')}}"
+          style="text-decoration: none; color: inherit"
+          ><h3 class="mb-0" style="direction: ltr; text-align: left">
+            {{ post.title }}
+          </h3></a
+        >
+        <div
+          class="mb-1 text-body-secondary"
+          style="direction: ltr; text-align: left"
+        >
+          {{ post.date_created }}
+        </div>
+        <p class="mb-auto" style="direction: ltr; text-align: left">
+          {{ limit_postlength(post.body)}}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %} {% endfor %}{% endblock %}
