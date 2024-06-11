@@ -223,202 +223,134 @@ def create_user():
 
 @app.route("/create_post/<user_id>", methods=["POST"])
 def create_post(user_id):
+    """Creates a new post from JSON input and returns its data and 201"""
     user = User.query.filter(User.id == user_id).first()
-
     if not user:
-        return (jsonify({"error": "User not found"}), 404)
-    data = request.get_json()
-    
+        return (jsonify({"error": "User Not Found"}), 404)
+
+
+    data = request.get_json()  # Parse JSON data from request body
+
+
+
     if not data:
-        return (jsonify({"error":"Invalid Input"}), 400)
-    
+        return jsonify({"error": "Invalid input"}), 400
+
+    # Extract data from the JSON payload
     title = data.get("title")
     body = data.get("body")
     category = data.get("category")
     post_image_b64 = data.get("post_image")
 
-    if not all([title, body, category]):
-        return (jsonify({"error": "Missing required fields"}), 400)
-
+    if not all([title, body, category, post_image_b64]):
+        return jsonify({"error": "Missing required fields"}), 400
 
     post = Post(title=title, body=body, category=category, user=user)
+    # Save post to the database
     db.session.add(post)
     db.session.commit()
 
-    # Add post image to data base if user passed in one
+    # Handle profile image if provided
     if post_image_b64:
-        image = Image(img=post_image_b64, name=f"{post.id}_post.jpg", mimetype="image/jpeg", post=post)
-        db.session.add(image)
+        post_image = Image(img=post_image_b64, mimetype='image/jpeg', name=f"{post.id}_post.jpg", post=post)
+        db.session.add(post_image)
         db.session.commit()
 
-    return (jsonify(post=post_to_dict(post)), 201)
+    return jsonify(post=post_to_dict(post)), 201
 
-
-@app.route("/edit_user/<user_id>", methods=["PUT"])
-def edit_user(user_id):
-    """Creates a new user from JSON input and returns its data"""
-    user = User.query.filter(User.id == user_id).first()
-    if not user:
-        return (jsonify({"error": "User Not Found"}), 404)
+@app.route("/edit_post/<post_id>", methods=["PUT"])
+def edit_post(post_id):
+    """Edits post from corresponding ID, returns (post with 201 if PUT succesful), 
+    (404 if post not found), (400 if invalid data is input or a field is missing)"""
+    post = Post.query.filter(Post.id == post_id).first()
+    
+    # Check if post exists
+    if not post:
+        return (jsonify({"error": "Post Not Found"}), 404)
 
     data = request.get_json()  # Parse JSON data from request body
 
+    # Checks if post entered input
     if not data:
         return (jsonify({"error": "Invalid input"}), 400)
 
     # Extract data from the JSON payload
-    name = data.get("name")
-    email = data.get("email")
-    password = data.get("password")
-    date_of_birth = data.get("date_of_birth")
-    address = data.get("address")
-    bio = data.get("bio")
-    profile_image_data = data.get("profile_image")  # Assuming image data is sent as base64 string or URL
-    date_object = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+    title = data.get("title")
+    body = data.get("body")
+    category = data.get("category")
 
-    if not all([name, email, password, date_of_birth, address, bio]):
+
+    if not all([title, body, category]):
         return jsonify({"error": "Missing required fields"}), 400
 
-    user.name = name
-    user.email = email
-    user.password = password
-    user.date_of_birth = date_object
-    user.address = address
-    user.bio = bio
+
+    post.title = title
+    post.body = body
+    post.category = category
     
-    # Create User and UserDetail instances
-    # Save user to the database
-    db.session.commit()
+    db.session.commit() # Save user to the database
+    return jsonify(user=post_to_dict(post)), 201
 
-    return jsonify(user=user_to_dict(user)), 201
-
-
-
-@app.route("/delete_user/<user_id>", methods=["GET", "DELETE"])
+@app.route("/delete_user/<user_id>", methods=["DELETE"])
 def delete_user(user_id):
-    """Deletes current user when called
-    DELETE: returns 200, redirects to root router"""
+    """Returns 200 if user deleted successfully or 404 if user not found"""
     user = User.query.filter(User.id == user_id).first()
-    flash(f"{user.name} Has been deleted", category="danger")
+
+    if not user:
+        return (jsonify({"response": "User Not Found"}), 404) # Checks if user exists
+
     db.session.delete(user)
     db.session.commit()
 
-    session.pop("is_signed_in", None)
-    session.pop("username", None)
-    session.pop("user_id", None)
-
-    return redirect(url_for("root")) # The 200 request has succeeded, and the resource has been deleted
+    return (jsonify({"response": "User deleted succesfully"}), 200)
 
 
 
-@app.route("/new_post/<user_id>", methods=["GET", "POST"])
-def new_post(user_id):
-    """Routes user to new_post.html page to publish a new post
-    GET: returns 200
-    POST: returns 201"""
-    user = User.query.filter(User.id == user_id).first()
-    if request.method == "POST":
-        form_title = request.form["title"]
-        form_body = request.form["body"]
-        form_category = request.form.get("category")
-        form_image = request.files["image"]
-        post = Post(title=form_title, body=form_body, user=user, category=form_category)
-        db.session.add(post)
-        db.session.commit()
-            
-        if form_image:
-            filename = secure_filename(form_image.filename)
-            image = Image(img=form_image.read(), mimetype=form_image.mimetype, name=filename, post=post)
-            db.session.add(image)
-            db.session.commit()
-        flash("Your post has been published", category="success")
-        return redirect(url_for("select_post_view", post_id=post.id, from_view="user_gallery")) # The 201 request has been fulfilled as new resources are being created
-    return (render_template("post_temps/new_post.html"), 200) # The request has suceeded, as the new_post.html page is returned.
+@app.route("/delete_image/<image_id>", methods=["DELETE"])
+def delete_image(image_id):
+    """Returns 200 if image deleted successfully or 404 if user not found"""
+    image = Image.query.filter(Image.id == image_id).first()
+
+    if not image:
+        return (jsonify({"response": "Image Not Found"}), 404) # Checks if image exists
+
+    db.session.delete(image)
+    db.session.commit()
+
+    return (jsonify({"response": "Image deleted succesfully"}), 200)
 
 
-@app.route("/delete_post/<post_id>", methods=["GET", "DELETE"])
+@app.route("/delete_post/<post_id>", methods=["DELETE"])
 def delete_post(post_id):
-    """Deletes current post at post_id and routes to user_gallery.html
-    DELETE: returns 200, redirects to user_gallery router"""
-    flash("Post Deleted", category="danger")
+    """Returns 200 if user deleted successfully or 404 if user not found"""
     post = Post.query.filter(Post.id == post_id).first()
-    user = User.query.filter(User.id == Post.user_id).first()
+
+    if not post:
+        return (jsonify({"response": "Post Not Found"}), 404) # Checks if post exists
+
     db.session.delete(post)
     db.session.commit()
 
-    return redirect(url_for("user_gallery", user_id=user.id)) # The 200 request has succeeded, and the resource has been deleted
-
-@app.route("/edit_post/<post_id>", methods=["GET", "POST"])
-def edit_post(post_id):
-    """Lets users edit posts, routes user to edit_post.htm, 
-    GET: returns 200 
-    POST: returns 201"""
-    request_from = request.args.get("from_view")
-    post = Post.query.filter(Post.id == post_id).first()
-    print(post.title)
-    if request.method == "POST":
-        # Check if user is submiting edit post form
-        form_title = request.form["title"]
-        form_body = request.form["body"]
-        form_category = request.form["category"]
-        form_image = request.files["image"]
-        if form_image:
-            # Check if user uploaded a new post image
-            filename = secure_filename(form_image.filename)
-            image = Image(img=form_image.read(), mimetype=form_image.mimetype, name=filename, post=post)
-            db.session.add(image)
-            db.session.commit()
-        post.title = form_title
-        post.body = form_body
-        post.category = form_category
-        db.session.commit()
-        flash("Post has been updated", category="info")
-        return redirect(url_for("select_post_view", post_id=post.id, from_view=request_from)) # The 201 request has been fulfilled as new resources are being created 
-    return render_template("post_temps/edit_post.html", post=post, from_view=request_from) # The request has suceeded, as the edit_post.html page is returned
+    return (jsonify({"response": "Post deleted succesfully"}), 200)
 
 
 
 
-@app.route("/select_post_view/<post_id>")
-def select_post_view(post_id):
-    """Routes user to select_post_view page where user can edit or delete current post
-    GET: returns 200"""
-    request_from = request.args.get("from_view")
-    print(request_from)
-    post = Post.query.filter(Post.id == post_id).first()
-    user = User.query.filter(User.id == post.user_id).first()
-    images = Image.query.filter(Image.post_id == post.id).all()
-    profile_image = Image.query.filter(Image.user_detail_id == UserDetail.query.filter(UserDetail.user_id == user.id).first().id).first()
-    return render_template("post_temps/select_post_view.html", post=post, user=user, images=images, from_view=request_from, profile_image=profile_image) # The request has succeeded, as the select_view_post.html page is returned
-
-@app.route("/select_image_view/<image_id>", methods=["GET", "POST", "DELETE"])
-def select_image_view(image_id):
-    """Routes to select_image_view.html page where user can see a current image in full scale or delete image
-    GET: returns 200,
-    DELETE: returns 200"""
-    request_from = request.args.get("from_view")
-    image = Image.query.filter(Image.id == image_id).first()
-    if not image or not image.post:
-        return render_template("error_temps/500.html")
-    post = Post.query.filter(Post.id == image.post_id).first()
-    if request.method == "POST" or request.method == "DELETE":
-        db.session.delete(image)
-        db.session.commit()
-        flash("Image has been deleted", category="danger")
-        return redirect(url_for("select_post_view", post_id=post.id, from_view=request_from)) # The 200 request has succeeded, and the resource has been deleted
-    return render_template("image_temps/select_image_view.html", from_view=request_from, image=image, post=post) # The 200 request has succeeded, as the select_view_post.html page is returned
 
 
-# @app.errorhandler(404)
-# def not_found_error(error):
-#     """Routes user to 404.html if a non existing route is entered"""
 
-#     return render_template("error_temps/404.html"), 404
 
-# @app.errorhandler(500)
-# def internal_server_error(error):
 
-#     return render_template("error_temps/500.html"), 500
+@app.errorhandler(404)
+def not_found_error(error):
+    """Routes post to 404.html if a non existing route is entered"""
+
+    return jsonify({"response": "Not Found Error"}), 404
+
+@app.errorhandler(500)
+def internal_server_error(error):
+
+    return jsonify({"response": "Internal Server Errror"}), 500
 
 
 def new_post(title, body, category):

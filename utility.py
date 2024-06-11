@@ -28,6 +28,6 @@ def image_to_dict(image):
         "name": image.name,
         "mimetype": image.mimetype,
         "post_id": image.post_id,
-        "user_detail": image.user_detail_id
+        "user_id": image.user_id
     }   
 
