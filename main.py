@@ -92,13 +92,13 @@ def root():
     posts = Post.query.all()
     post_list = []
 
+
+
     for post in posts:
         post_list.append(post_to_dict(post))
 
 
-    return (jsonify(post_list), 200)
-
-
+    return (jsonify(posts=post_list), 200)
 
 
 @app.route("/get_posts_by_user_id/<user_id>", methods=["GET"])
@@ -228,22 +228,21 @@ def create_post(user_id):
     if not user:
         return (jsonify({"error": "User Not Found"}), 404)
 
-
-    data = request.get_json()  # Parse JSON data from request body
-
-
-
+    data = request.get_json()
     if not data:
-        return jsonify({"error": "Invalid input"}), 400
+        return (jsonify({"error": "No Input Detected"}), 400)   # Parse JSON data from request body
 
     # Extract data from the JSON payload
-    title = data.get("title")
-    body = data.get("body")
-    category = data.get("category")
-    post_image_b64 = data.get("post_image")
+    try: 
+        title = data.get("title")
+        body = data.get("body")
+        category = data.get("category")
+        post_image_b64 = data.get("post_image")
+    except AttributeError:
+        return (jsonify({"error": "Invalid JSON Input Detected"}), 400)
 
-    if not all([title, body, category, post_image_b64]):
-        return jsonify({"error": "Missing required fields"}), 400
+    if not all([title, body, category]):
+        return (jsonify({"error": "Missing required fields"}), 400)
 
     post = Post(title=title, body=body, category=category, user=user)
     # Save post to the database
@@ -256,7 +255,7 @@ def create_post(user_id):
         db.session.add(post_image)
         db.session.commit()
 
-    return jsonify(post=post_to_dict(post)), 201
+    return (jsonify(post=post_to_dict(post)), 201)
 
 @app.route("/edit_post/<post_id>", methods=["PUT"])
 def edit_post(post_id):
@@ -335,12 +334,6 @@ def delete_post(post_id):
 
 
 
-
-
-
-
-
-
 @app.errorhandler(404)
 def not_found_error(error):
     """Routes post to 404.html if a non existing route is entered"""
@@ -352,59 +345,10 @@ def internal_server_error(error):
 
     return jsonify({"response": "Internal Server Errror"}), 500
 
+@app.errorhandler(415)
+def unsupported_media_type(error):
 
-def new_post(title, body, category):
-    user = User.query.filter(User.name == "TestUser0").first()
-    post = Post(title=title, body=body, category=category, user=user)
-
-    db.session.add(post)
-    db.session.commit()
-    print(f"-- Post added to Database for {user.name} --\n")
-
-def unit_test_new_post():
-    print("\n----- Starting Unit Test -----\n\n")
-    # Unit Test: Creating a new blog post with valid data
-    print("Unit Test: Create a new blog post with valid data")
-    new_post(title="Almond Cupcake with Raspberry Cheesecake Frosting", body="It tastes like springtime,” said Alana, our fabulous photographer, after her first bite of this creation. This cupcake was vying for top billing as well, and, depending on my mood, could steal the crown.",category="Dessert")
-
-    # Unit Test: Create a new blog post with very long title
-    print("Unit Test: Create a new blog post with very long title")
-    new_post(title="Deliciously Decadent Almond Cupcake Infused with Rich Vanilla Extract, Topped with a Creamy Raspberry Cheesecake Frosting and Garnished with Freshly Picked Raspberries for a Burst of Summery Sweetness", body="It tastes like springtime,” said Alana, our fabulous photographer, after her first bite of this creation. This cupcake was vying for top billing as well, and, depending on my mood, could steal the crown.", category="Dessert")
-
-    # Unit Test: Create a new blog post with very long body
-    print("Unit Test: Create a new blog post with very long body")
-    new_post(title="Almond Cupcake with Raspberry Cheesecake Frosting", body="It tastes like springtime,” said Alana, our fabulous photographer, after her first bite of this creation. This cupcake was vying for top billing as well, and, depending on my mood, could steal the crown. This cupcake was more delicate and dainty, where the cookie dough cupcake was bulkier, and more binge-eating worthy. The almond-flavored cake was delicious, and felt dense but not heavy. There was still a fluffiness to the cake, but there was enough body to make the small cupcake satisfying.This balance in baking is incredibly difficult — things tend to either be too fluffy and spongy, and feel like they will fall under the weight of heavy frosting, or they are so dense they feel solid and lose their spring. This was the perfect consistency. Occasionally crunching on raspberry seeds in the frosting was a pleasant reminder that it was the real deal. It was not overpoweringly fruity either, leaving a lot of the sugary, creamy cheesecake flavor to shine through, with the raspberry being the subtle top note. Together, this pairing was absolutely perfect. This would be a great cupcake for a high tea, a fancy dress birthday party with sparkling wines, or a super classy wedding that had a jazz band or orchestra for music instead of a DJ. That’s the feel of this cupcake. Sure, you can eat it on the couch in your sweatpants, but I feel like this cupcake deserves better", category="Dessert")
-
-    # Unit Test: Create a new blog post with very short title
-    print("Unit Test: Create a new blog post with very short title")
-    new_post(title="Alm..", body="If you’ve read my reviews before, you will know that I am not a huge fan of lemon-flavored desserts. While I can appreciate them, they’re not my thing. That said, I do try and be objective in my reviews.", category="Dessert")
-
-    # Unit Test: Create a new blog post with very short body
-    print("Unit Test: Create a new blog post with very short body")
-    new_post(title="Almond Cupcake with Raspberry Cheesecake Frosting", body="If you've...", category="Dessert")
-
-    # Unit Test: Create a new blog post with empty title
-    print("Unit Test: Create a new blog post with empty title")
-    new_post(title="", body="If you’ve read my reviews before, you will know that I am not a huge fan of lemon-flavored desserts. While I can appreciate them, they’re not my thing. That said, I do try and be objective in my reviews.", category="Dessert")
-
-    # Unit Test: Create a new Blog post with empty body
-    print("Create a new blog post with empty body")
-    new_post(title="Almond Cupcake with Raspberry Cheesecake Frosting", body="", category="Dessert")
-
-    # Unit Test: Create a new blog post with an empty category
-    print("Unit Test: Create a new blog post with an empty category")
-    new_post(title="Almond Cupcake with Raspberry Cheesecake Frosting", body="If you’ve read my reviews before, you will know that I am not a huge fan of lemon-flavored desserts. While I can appreciate them, they’re not my thing. That said, I do try and be objective in my reviews.", category="")
-
-
-    # Unit Test: Create a new blog post with special characters in title
-    print("Unit Test: Create a new blog post with special characters in title")
-    new_post(title="!§&$/%(§%)§%§%=&)/$Almond Cupcake with Raspberry Cheesecake Frosting!§&$/%(§%)§%§%=&)/$", body="If you’ve read my reviews before, you will know that I am not a huge fan of lemon-flavored desserts. While I can appreciate them, they’re not my thing. That said, I do try and be objective in my reviews.", category="Dessert")
-
-    # Unit Test: Create a new blog post with special characters in catergory
-    print("Unit Test: Create a new blog post with special characters in category")
-    new_post(title="Almond Cupcake with Raspberry Cheesecake Frosting", body="If you’ve read my reviews before, you will know that I am not a huge fan of lemon-flavored desserts. While I can appreciate them, they’re not my thing. That said, I do try and be objective in my reviews.", category="!§&$/%(§%)§%§%=&)/$Dessert!§&$/%(§%)§%§%=&)/$")
-
-    print("\n\n----- Ending Unit Test -----\n")
+    return jsonify({"response": "Unsupported Media Type"}), 415
 
 
 # with app.app_context():
@@ -413,8 +357,6 @@ def unit_test_new_post():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    # unit_test_new_post()
-    pass
 
 
 
