@@ -28,7 +28,7 @@ git clone https://github.com/ScreedVA/REST-SERVICE-Foodblogger.git
 
 Move into repository directory
 ```bash (In Terminal)
-cd ScreedVA-REST-SERVICE-Foodblogger
+cd REST-SERVICE-Foodblogger
 ```
 
 Create virtual environement
