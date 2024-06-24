@@ -68,25 +68,25 @@ python unit_test_create_post.py
 
 ## Dependancies
 
-alembic==1.13.1
-blinker==1.8.2
-click==8.1.7
-colorama==0.4.6
-Flask==3.0.3
-Flask-Migrate==4.0.7
-Flask-SQLAlchemy==3.1.1
-greenlet==3.0.3
-iniconfig==2.0.0
-itsdangerous==2.2.0
-Jinja2==3.1.4
-Mako==1.3.3
-MarkupSafe==2.1.5
-packaging==24.1
-pluggy==1.5.0
-pytest==8.2.2
-SQLAlchemy==2.0.30
-typing_extensions==4.11.0
-Werkzeug==3.0.3
+-alembic==1.13.1
+-blinker==1.8.2
+-click==8.1.7
+-colorama==0.4.6
+-Flask==3.0.3
+-Flask-Migrate==4.0.7
+-Flask-SQLAlchemy==3.1.1
+-greenlet==3.0.3
+-iniconfig==2.0.0
+-itsdangerous==2.2.0
+-Jinja2==3.1.4
+-Mako==1.3.3
+-MarkupSafe==2.1.5
+-packaging==24.1
+-pluggy==1.5.0
+-pytest==8.2.2
+-SQLAlchemy==2.0.30
+-typing_extensions==4.11.0
+-Werkzeug==3.0.3
 
 ## References
 > This application uses prototyping example data for posts inpired from food forums online, are from the following citations, (in-text citations included in data output for posts)
