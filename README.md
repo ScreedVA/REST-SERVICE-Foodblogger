@@ -41,11 +41,6 @@ Activate virtual environemnt
 .venv\Scripts\activate
 ```
 
-Activate virtual environemnt
-```bash (In Terminal)
-.venv\Scripts\activate
-```
-
 Install pip if nessasary
 ```bash (In Terminal)
 python -m pip install --upgrade pip
