@@ -92,8 +92,10 @@ Werkzeug==3.0.3
 ## References
 > This application uses prototyping example data for posts inpired from food forums online, are from the following citations, (in-text citations included in data output for posts)
 
-Ma, N., Geary-Meyer, A., & Bettes, K. (2024, April 2). 25 best restaurants in Berlin, by local foodies. Time Out Berlin. https://www.timeout.com/berlin/restaurants/best-restaurants-in-berlin 
+Ma, N., Geary-Meyer, A., & Bettes, K. (2024, April 2). 25 best restaurants in Berlin, by local foodies. Time Out Berlin. https://www.timeout.com/berlin/restaurants/best-restaurants-in-berlin
+
 Qween City. (2019, August 11). Food Review: All of the desserts! https://qweencity.com/food-review-all-of-the-desserts/ 
+
 The 15 best places for breakfast food in Berlin. Foursquare. (n.d.). https://foursquare.com/top-places/berlin/best-places-breakfast-food 
 
 
