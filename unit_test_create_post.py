@@ -5,6 +5,9 @@ import unittest
 
 
 class FlaskTestCase(unittest.TestCase):
+    """Will test create_post route on User with a user name of TestUser1
+    In the case that TestUser1 is not availibe in the Database please create one through the create_user route 
+    through the application"""
     def setUp(self):
         app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
         app.config["TESTING"] = True

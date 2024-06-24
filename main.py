@@ -1,36 +1,16 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, url_for, request, redirect, session, flash, jsonify
-from werkzeug.utils import secure_filename 
+from flask import Flask,  request, jsonify
 from datetime import datetime
-from base64 import b64encode
-import base64
 from flask_migrate import Migrate
 from utility import user_to_dict, image_to_dict, post_to_dict
+from sqlalchemy.exc import IntegrityError
 app = Flask(__name__)
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///foodBloggerDB.sqlite3"
 app.secret_key = "secret key"
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-
-# -------- Utility Functions -------- #
-
-def limit_postlength(post):
-    if len(post) > 100:
-        shorted_post = post[:100]
-        return f"{shorted_post}..."
-    return post
-
-
-
-def b64encode(value):
-    return base64.b64encode(value).decode('utf-8')
-
-app.jinja_env.filters['b64encode'] = b64encode
-
-# -------- Utility Functions -------- #
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -59,16 +39,6 @@ class Post(db.Model):
     def __repr__(self) -> str:
         return f"<ID: {self.id} Title: {self.title} Body: {self.body} User ID: {self.user_id}"
 
-# class UserDetail(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     address = db.Column(db.String(100))
-#     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-#     bio = db.Column(db.Text)
-#     date_of_birth = db.Column(db.Date)
-
-#     def __repr__(self) -> str:
-#         return f"<ID: {self.id} Name:{self.user_id} Mimetype: {self.date_of_birth}"
-
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     img = db.Column(db.Text, nullable=False)
@@ -80,11 +50,6 @@ class Image(db.Model):
     def __repr__(self) -> str:
         return f"<ID: {self.id} Name:{self.name} Mimetype: {self.mimetype} Data: {self.img}"
 
-
-
-# class User_Image(db.Model):
-#     pass
-
 @app.route("/", methods=["GET"])
 def root():
     """Routes user to root page and displays all user posts
@@ -92,8 +57,9 @@ def root():
     posts = Post.query.all()
     post_list = []
 
-
-
+    if not posts:
+        return jsonify({"error": "Posts Not Found"}), 404
+    
     for post in posts:
         post_list.append(post_to_dict(post))
 
@@ -104,11 +70,16 @@ def root():
 @app.route("/get_posts_by_user_id/<user_id>", methods=["GET"])
 def get_posts_by_user_id(user_id):
     """Returns 200 if posts found, else 404"""
+    user = User.query.filter(User.id == user_id).first()
+    if not user:
+        return (jsonify({"error": "User Not Found"}), 404)
+
     posts = Post.query.filter(Post.user_id == user_id).all()
     post_list = []
-    # If user has no posts
+
+
     if not posts:
-        return (jsonify({"response": "Not found Error"}), 404)
+        return (jsonify({"response": "Posts found Error"}), 404)
     
 
     for post in posts:
@@ -133,7 +104,7 @@ def get_user_by_id(user_id):
     user = User.query.filter(User.id == user_id).first()
 
     if not user:
-        return (jsonify({"response": "Not Found Error"}), 404)
+        return (jsonify({"error": "User Found Error"}), 404)
     return (jsonify(user_to_dict(user)), 200)
 
 @app.route("/get_all_users", methods=["GET"])
@@ -157,7 +128,7 @@ def get_all_images():
 
     # Returns 404 if there are no images
     if not images:
-        return (jsonify({"response": "Not Found Error"}), 404)
+        return (jsonify({"response": "Images Found Error"}), 404)
     
     # Parses SQL Alchemy Image object to Python dictionary data type
     image_list = [image_to_dict(image) for image in images]
@@ -166,11 +137,16 @@ def get_all_images():
 @app.route("/get_images_by_post_id/<post_id>", methods=["GET"])
 def get_images_by_post_id(post_id): 
     """Returns post images and 200 if post images exist else 404"""
+    post = Post.query.filter(Post.id == post_id).first()
+
+    if not post:
+        return (jsonify({"error": "Post Not Found"}), 404)
+
     images = Image.query.filter(Image.post_id == post_id).all()
 
     # Returns 404 if post has no images
     if not images:
-        return (jsonify({"response": "Not Found Error"}), 404)
+        return (jsonify({"response": "Images Not Found"}), 404)
     
     # Parses SQL Alchemy Image object to Python dictionary data type
     image_list = [image_to_dict(image) for image in images]
@@ -194,6 +170,7 @@ def create_user():
     if not data:
         return jsonify({"error": "Invalid input"}), 400
 
+    
     # Extract data from the JSON payload
     name = data.get("name")
     email = data.get("email")
@@ -206,12 +183,22 @@ def create_user():
     if not all([name, email, password, date_of_birth, address, bio]):
         return jsonify({"error": "Missing required fields"}), 400
 
-    # Create User and UserDetail instances
+    # Create User instance
     date_object = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
     user = User(name=name, email=email, password=password, address=address, bio=bio, date_of_birth=date_object)
-    # Save user and user detail to the database
-    db.session.add(user)
-    db.session.commit()
+    # Save user to the database
+    
+    
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except IntegrityError as e:
+        if "UNIQUE constraint failed: user.email" in str(e.orig):
+            return jsonify({"error": "Email already exists"}), 400
+        elif "UNIQUE constraint failed: user.name" in str(e.orig):
+            return jsonify({"error": "Name already exists"}), 400
+        else:
+            return jsonify({"error": "Database error"}), 500
 
     # Handle profile image if provided
     if profile_image_data:
@@ -290,13 +277,55 @@ def edit_post(post_id):
     db.session.commit() # Save user to the database
     return jsonify(user=post_to_dict(post)), 201
 
+
+
+@app.route("/edit_user/<user_id>", methods=["PUT"])
+def edit_user(user_id):
+    """Edits usert from corresponding ID, returns (post with 201 if PUT succesful), 
+    (404 if post not found), (400 if invalid data is input or a field is missing)"""
+    user = User.query.filter(User.id == user_id).first()
+    
+    # Check if user exists
+    if not user:
+        return (jsonify({"error": "Post Not Found"}), 404)
+
+    data = request.get_json()  # Parse JSON data from request body
+
+    # Checks if user entered input
+    if not data:
+        return (jsonify({"error": "Invalid input"}), 400)
+
+    # Extract data from the JSON payload
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")
+    date_of_birth = data.get("date_of_birth")
+    address = data.get("address")
+    bio = data.get("bio")
+
+    date_object = datetime.strptime(date_of_birth, "%Y-%m-%d").date()
+    if not all([name, email, password, date_of_birth, address, bio]):
+        return jsonify({"error": "Missing required fields"}), 400
+
+
+    user.name = name
+    user.email = email
+    user.password = password
+    user.date_of_birth = date_object
+    user.address = address
+    user.bio = bio
+
+
+    db.session.commit() # Save user to the database
+    return jsonify(user=user_to_dict(user)), 201
+
 @app.route("/delete_user/<user_id>", methods=["DELETE"])
 def delete_user(user_id):
     """Returns 200 if user deleted successfully or 404 if user not found"""
     user = User.query.filter(User.id == user_id).first()
 
     if not user:
-        return (jsonify({"response": "User Not Found"}), 404) # Checks if user exists
+        return (jsonify({"error": "User Not Found"}), 404) # Checks if user exists
 
     db.session.delete(user)
     db.session.commit()
@@ -311,7 +340,7 @@ def delete_image(image_id):
     image = Image.query.filter(Image.id == image_id).first()
 
     if not image:
-        return (jsonify({"response": "Image Not Found"}), 404) # Checks if image exists
+        return (jsonify({"error": "Image Not Found"}), 404) # Checks if image exists
 
     db.session.delete(image)
     db.session.commit()
@@ -325,7 +354,7 @@ def delete_post(post_id):
     post = Post.query.filter(Post.id == post_id).first()
 
     if not post:
-        return (jsonify({"response": "Post Not Found"}), 404) # Checks if post exists
+        return (jsonify({"error": "Post Not Found"}), 404) # Checks if post exists
 
     db.session.delete(post)
     db.session.commit()
@@ -351,10 +380,6 @@ def unsupported_media_type(error):
     return jsonify({"response": "Unsupported Media Type"}), 415
 
 
-# with app.app_context():
-#     db.drop_all()
-#     db.create_all()
-
 if __name__ == "__main__":
     app.run(debug=True)
 
@@ -362,13 +387,9 @@ if __name__ == "__main__":
 
 
 
-# TODO Combine user_details and user into a single table and set a foreign key in users
-# TODO Add feature to test one endpoint
-# TODO MAJOR REFACTORING OF ALL ROUTES TO RETURN HTTP RESPONSE OR JSON DATA
-# TODO Create dictionary parsing functions as utilities for returning JSON DATA
 
 # ----- Bugs ----- #
-"""Bug: input/textarea tags for (signup,new_post,edit_post) allow strings of unending single line characters"""
+
 # ----- Bugs ----- #
 
 
@@ -379,13 +400,17 @@ if __name__ == "__main__":
 
 # ----- Fixed Bugs ----- #
 # ----- DONE TODOS ----- #
+
+# TODO Combine user_details and user into a single table and set a foreign key in users
+# TODO Add feature to test one endpoint
+# TODO MAJOR REFACTORING OF ALL ROUTES TO RETURN HTTP RESPONSE OR JSON DATA
+# TODO Create dictionary parsing functions as utilities for returning JSON DATA
 # TODO  Add flash messages
 # TODO Add form validation
 # TODO 1 Add 2 new column feilds to user: description, user_image-backref
 # TODO 2 Modifiy constraint on user table column post-backref: Add cascade(delete orphan) constraint
 # TODO Add feature to let user delete a post and image
 # TODO Add user image(optional) and user description(optional) columns
-# TODO  Paraphrase the template default posts in the database
 # TODO Add feature which lets users view other viewers profiles by clicking on the name of a post
 
 # ----- DONE TODOS ----- #

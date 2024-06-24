@@ -22,45 +22,51 @@ The Python Rest Service utilizes Flask decorators to initialize routes for api e
 ## Installation
 
 Clone repository
-```bash
+```bash (In Terminal)
 git clone https://github.com/ScreedVA/ScreedVA-ScreedVA-Project-Assignment-Food-Blogger-FlaskPython-Backend-Development-2nd-Semester.git
 ```
 
 Move into repository directory
-```bash
+```bash (In Terminal)
 cd ScreedVA-ScreedVA-Project-Assignment-Food-Blogger-FlaskPython-Backend-Development-2nd-Semester
 ```
 
 Create virtual environement
-```bash
+```bash (In Terminal)
 python -m venv .venv
 ```
 
 Activate virtual environemnt
-```bash
+```bash (In Terminal)
 .venv\Scripts\activate
 ```
 
 Activate virtual environemnt
-```bash
+```bash (In Terminal)
 .venv\Scripts\activate
 ```
 
 Install pip if nessasary
-```bash
+```bash (In Terminal)
 python -m pip install --upgrade pip
 ```
 
 Install project dependencies
-```bash
+```bash (In Terminal)
 pip install -r requirements.txt
 ```
 
 ## Usage
 Simply run the application and open [localhost:5000](http://127.0.0.1:5000) on your browser
-```bash
+```bash (In Terminal)
 python main.py
 ```
+
+To perform the unit test for this application simply run
+```bash (In Terminal)
+python unit_test_create_post.py
+```
+
 
 ## Contact Info
 [LinkedIn Profile](https://www.linkedin.com/in/christian-damete-yeboa-bb79442a3/)
@@ -86,5 +92,12 @@ pytest==8.2.2
 SQLAlchemy==2.0.30
 typing_extensions==4.11.0
 Werkzeug==3.0.3
+
+## References
+> This application uses prototyping example data for posts inpired from food forums online, are from the following citations, (in-text citations included in data output for posts)
+
+Ma, N., Geary-Meyer, A., & Bettes, K. (2024, April 2). 25 best restaurants in Berlin, by local foodies. Time Out Berlin. https://www.timeout.com/berlin/restaurants/best-restaurants-in-berlin 
+Qween City. (2019, August 11). Food Review: All of the desserts! https://qweencity.com/food-review-all-of-the-desserts/ 
+The 15 best places for breakfast food in Berlin. Foursquare. (n.d.). https://foursquare.com/top-places/berlin/best-places-breakfast-food 
 
 
