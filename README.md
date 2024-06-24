@@ -23,12 +23,12 @@ The Python Rest Service utilizes Flask decorators to initialize routes for api e
 
 Clone repository
 ```bash (In Terminal)
-git clone https://github.com/ScreedVA/ScreedVA-ScreedVA-Project-Assignment-Food-Blogger-FlaskPython-Backend-Development-2nd-Semester.git
+git clone https://github.com/ScreedVA/REST-SERVICE-Foodblogger.git
 ```
 
 Move into repository directory
 ```bash (In Terminal)
-cd ScreedVA-ScreedVA-Project-Assignment-Food-Blogger-FlaskPython-Backend-Development-2nd-Semester
+cd ScreedVA-REST-SERVICE-Foodblogger
 ```
 
 Create virtual environement
