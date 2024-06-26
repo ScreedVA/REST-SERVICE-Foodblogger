@@ -1,4 +1,10 @@
 {
+	"info": {
+		"_postman_id": "d8ea584a-0239-45b8-8d7a-f0f3d3224274",
+		"name": "FoodBlogger REST SERVICE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34109942"
+	},
 	"item": [
 		{
 			"name": "GETS",
@@ -393,7 +399,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "[\n{\n\"address\": \"example str, 123\",\n\"bio\": \"Passionate dessert enthusiast with a sweet tooth and a penchant for indulgence\",\n\"date_joined\": \"Wed, 12 Jun 2024 00:00:00 GMT\",\n\"date_of_birth\": null,\n\"email\": \"bob@example.com\",\n\"id\": 1,\n\"name\": \"Bob\",\n    \"password\": \"password123\"\n    }\n]"
+							"body": "[\n    {\n    \"address\": \"example str, 123\",\n    \"bio\": \"Passionate dessert enthusiast with a sweet tooth and a penchant for indulgence\",\n    \"date_joined\": \"Wed, 12 Jun 2024 00:00:00 GMT\",\n    \"date_of_birth\": null,\n    \"email\": \"bob@example.com\",\n    \"id\": 1,\n    \"name\": \"Bob\",\n    \"password\": \"password123\"\n    }\n]"
 						},
 						{
 							"name": "GET get_all_users Unsuccessful Response",
@@ -466,7 +472,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n\"images\": [\n{\n\"id\": 1,\n\"img\": \"/9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNtcwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWxjbXMAAAAAAAAAAAAAAA...\",\n            \"mimetype\": \"image/jpeg\",\n            \"name\": \"10_post.jpg\",\n            \"post_id\": 10,\n            \"user_id\": null\n        }\n    ]\n}"
+							"body": "{\n    \"images\": [\n        {\n            \"id\": 1,\n            \"img\": \"/9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNtcwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWxjbXMAAAAAAAAAAAAAAA...\",\n            \"mimetype\": \"image/jpeg\",\n            \"name\": \"10_post.jpg\",\n            \"post_id\": 10,\n            \"user_id\": null\n        }\n    ]\n}"
 						},
 						{
 							"name": "GET get_all_images Unsuccessful Response",
@@ -551,7 +557,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\r\n\"image\": {\r\n\"id\": 1,\r\n\"img\": \"/9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNtcwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWxjbXMAAAAAAAAAAAAAAA...\",\r\n        \"mimetype\": \"image/jpeg\",\r\n        \"name\": \"10_post.jpg\",\r\n        \"post_id\": 10,\r\n        \"user_id\": null\r\n    }\r\n}"
+							"body": "{\r\n    \"image\": {\r\n        \"id\": 1,\r\n        \"img\": \"/9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNtcwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWxjbXMAAAAAAAAAAAAAAA...\",\r\n        \"mimetype\": \"image/jpeg\",\r\n        \"name\": \"10_post.jpg\",\r\n        \"post_id\": 10,\r\n        \"user_id\": null\r\n    }\r\n}"
 						},
 						{
 							"name": "GET get_image_by_id Unsuccesful Response",
@@ -639,7 +645,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\r\n \"images\": [\r\n {\r\n\"id\": 1,\r\n\"img\": \"/9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNtcwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWxjbXMAAAAAAAAAAAAAAA...\",\r\n            \"mimetype\": \"image/jpeg\",\r\n            \"name\": \"10_post.jpg\",\r\n            \"post_id\": 10,\r\n            \"user_id\": null\r\n        }\r\n    ]\r\n}"
+							"body": "{\r\n    \"images\": [\r\n        {\r\n            \"id\": 1,\r\n            \"img\": \"/9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNtcwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWxjbXMAAAAAAAAAAAAAAA...\",\r\n            \"mimetype\": \"image/jpeg\",\r\n            \"name\": \"10_post.jpg\",\r\n            \"post_id\": 10,\r\n            \"user_id\": null\r\n        }\r\n    ]\r\n}"
 						},
 						{
 							"name": "GET get_images_by_post_id Unsuccessful Response",
@@ -688,7 +694,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\"name\": \"TestUser1\",\r\n\"email\": \"testuser3@example.com\",\r\n\"password\": \"password123\",\r\n    \"date_of_birth\": \"2000-01-01\",\r\n    \"address\": \"123 example str.\",\r\n    \"bio\": \"I like testing alot of food\"\r\n}",
+							"raw": "{\r\n    \"name\": \"TestUser1\",\r\n    \"email\": \"testuser3@example.com\",\r\n    \"password\": \"password123\",\r\n    \"date_of_birth\": \"2000-01-01\",\r\n    \"address\": \"123 example str.\",\r\n    \"bio\": \"I like testing alot of food\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -717,7 +723,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n\"name\": \"TestUser1\",\r\n\"email\": \"testuser3@example.com\",\r\n\"password\": \"password123\",\r\n\"date_of_birth\": \"2000-01-01\",\r\n\"address\": \"123 example str.\",\r\n\"bio\": \"I like testing alot of food\"\r\n}",
+									"raw": "{\r\n    \"name\": \"TestUser1\",\r\n    \"email\": \"testuser3@example.com\",\r\n    \"password\": \"password123\",\r\n    \"date_of_birth\": \"2000-01-01\",\r\n    \"address\": \"123 example str.\",\r\n    \"bio\": \"I like testing alot of food\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -750,7 +756,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n\"user\": {\n\"address\": \"123 example str.\",\n\"bio\": \"I like testing alot of food\",\n\"date_joined\": \"Wed, 12 Jun 2024 00:00:00 GMT\",\n\"date_of_birth\": \"Sat, 01 Jan 2000 00:00:00 GMT\",\n\"email\": \"testuser3@example.com\",\n\"id\": 4,\n\"name\": \"TestUser1\",\n\"password\": \"password123\"\n}\n}"
+							"body": "{\n    \"user\": {\n        \"address\": \"123 example str.\",\n        \"bio\": \"I like testing alot of food\",\n        \"date_joined\": \"Wed, 12 Jun 2024 00:00:00 GMT\",\n        \"date_of_birth\": \"Sat, 01 Jan 2000 00:00:00 GMT\",\n        \"email\": \"testuser3@example.com\",\n        \"id\": 4,\n        \"name\": \"TestUser1\",\n        \"password\": \"password123\"\n    }\n}"
 						},
 						{
 							"name": "PUT edit_user Unsuccessful Response",
@@ -792,7 +798,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n\"error\": \"Invalid input\"\n}"
+							"body": "{\n    \"error\": \"Invalid input\"\n}"
 						}
 					]
 				},
@@ -803,7 +809,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\"title\":\"I tested out a new Breakfast Again\",\r\n\"body\": \"I like testing out breakfast ideas\",\r\n\"category\": \"Breakfast\"\r\n}",
+							"raw": "{\r\n    \"title\": \"I tested out a new Breakfast Again\",\r\n    \"body\": \"I like testing out breakfast ideas\",\r\n    \"category\": \"Breakfast\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1190,7 +1196,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\"name\": \"TestUser1\",\r\n\"email\": \"testuser@example.com\",\r\n\"password\": \"password123\",\r\n\"date_of_birth\": \"2000-01-01\",\r\n    \"address\": \"123 example str.\",\r\n    \"bio\": \"I like testing food\",\r\n    \"profile_image\": \"/9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNtcwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWxjbXMAAAAAAAAAAAAAAA...\"\r\n}\r\n// Cannot pass in image using raw, use form-data as body.",
+							"raw": "{\r\n    \"name\": \"Steve\",\r\n    \"email\": \"steve@example.com\",\r\n    \"password\": \"password123\",\r\n    \"date_of_birth\": \"2000-01-01\",\r\n    \"address\": \"123 example str.\",\r\n    \"bio\": \"I like testing food\",\r\n    \"profile_image\": \"/9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNtcwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWxjbXMAAAAAAAAAAAAAAA...\"\r\n}\r\n// Cannot pass in image using raw, use form-data as body.",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1218,7 +1224,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n\"name\":\"TestUser2\",\r\n\"email\": \"testuser2@example.com\",\r\n\"password\": \"password123\",\r\n\"date_of_birth\": \"2000-01-01\",\r\n\"address\": \"123 example str.\",\r\n\"bio\": \"I like testing food\",\r\n\"profile_image\": \"/9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNtcwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWxjbXMAAAAAAAAAAAAAAA...\"\r\n}\r\n// Cannot pass in image using raw, use form-data as body.",
+									"raw": "{\r\n    \"name\": \"TestUser2\",\r\n    \"email\": \"testuser2@example.com\",\r\n    \"password\": \"password123\",\r\n    \"date_of_birth\": \"2000-01-01\",\r\n    \"address\": \"123 example str.\",\r\n    \"bio\": \"I like testing food\",\r\n    \"profile_image\": \"/9j/4AAQSkZJRgABAQAAAQABAAD/4gIcSUNDX1BST0ZJTEUAAQEAAAIMbGNtcwIQAABtbnRyUkdCIFhZWiAH3AABABkAAwApADlhY3NwQVBQTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWxjbXMAAAAAAAAAAAAAAA...\"\r\n}\r\n// Cannot pass in image using raw, use form-data as body.",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1248,7 +1254,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n\"user\": {\n\"address\": \"123 example str.\",\n\"bio\": \"I like testing food\",\n\"date_joined\": \"Wed, 12 Jun 2024 00:00:00 GMT\",\n\"date_of_birth\": \"Sat, 01 Jan 2000 00:00:00 GMT\",\n\"email\": \"testuser2@example.com\",\n\"id\": 5,\n\"name\": \"TestUser2\",\n\"password\": \"password123\"\n}\n}"
+							"body": "{\n    \"user\": {\n        \"address\": \"123 example str.\",\n        \"bio\": \"I like testing food\",\n        \"date_joined\": \"Wed, 12 Jun 2024 00:00:00 GMT\",\n        \"date_of_birth\": \"Sat, 01 Jan 2000 00:00:00 GMT\",\n        \"email\": \"testuser2@example.com\",\n        \"id\": 5,\n        \"name\": \"TestUser2\",\n        \"password\": \"password123\"\n    }\n}"
 						},
 						{
 							"name": "POST create_user Unsuccessful Response",
